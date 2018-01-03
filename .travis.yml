@@ -13,7 +13,7 @@ before_install:
   - pwd
   - ls -sort
   - cd ..
-  - mv travis-test CARTAvis
+  - mv travis_test CARTAvis
   - cd CARTAvis
   - ls -sort
   - pwd

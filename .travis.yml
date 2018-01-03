@@ -12,6 +12,12 @@ branches:
 before_install:
   - pwd
   - ls -sort
+  - cd ..
+  - mv travis-test CARTAvis
+  - cd CARTAvis
+  - ls -sort
+  - pwd
+  - echo $PWD
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
   - docker run -d -p 8080:8080 -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017

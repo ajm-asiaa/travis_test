@@ -11,11 +11,12 @@ branches:
 
 before_install:
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
-  - docker run -d -p 127.0.0.1:80:4567 -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
+  - docker run -p 8080:8080 -ti -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
 
 script:
   - echo "Building CARTA"
+  - ls
   - export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
   - cd /cartabuild/CARTAvis/carta/html5/common/skel
   - ./generate.py source-all > /dev/null

@@ -51,6 +51,8 @@ QString Animator::addLink( CartaObject* cartaObject ){
         if ( linkAdded ){
             connect( controller, SIGNAL(dataChanged(Controller*)),
                     this, SLOT(_adjustStateController(Controller*)) );
+            connect( controller, SIGNAL(dataChangedRegion(Controller*)),
+                                this, SLOT(_regionsChanged(Controller*)) );
             connect( controller, SIGNAL(axesChanged()),
                     this, SLOT(_axesChanged()));
             connect( controller, SIGNAL(frameChanged(Controller*, Carta::Lib::AxisInfo::KnownType)),
@@ -74,6 +76,7 @@ void Animator::_adjustStateController( Controller* controller){
     _updateSupportedZAxes( controller );
     _resetAnimationParameters(selectImageIndex);
 }
+
 
 void Animator::_adjustStateAnimatorTypes(){
     int animationCount = m_animators.size();
@@ -121,6 +124,15 @@ QString Animator::addAnimator( const QString& type, QString& animatorTypeId ){
                     _resetAnimationParameters( selectImage );
                 }
             }
+            else if ( type == Selection::REGION ){
+            	//Find a controller to use for setting up initial animation
+            	//parameters.
+            	Controller* controller = _getControllerSelected();
+            	if ( controller != nullptr ){
+            		int selectRegion = controller->getRegionIndexCurrent();
+            		_resetAnimationRegion( selectRegion );
+            	}
+            }
             else {
                 _updateAnimatorBound( type );
             }
@@ -148,6 +160,17 @@ void Animator::_addRemoveImageAnimator(){
     }
 }
 
+void Animator::_addRemoveRegionAnimator(){
+    int maxRegions = getMaxRegionCount();
+    if ( maxRegions > 1 ){
+        QString animId;
+        addAnimator( Selection::REGION, animId );
+    }
+    else {
+        removeAnimator( Selection::REGION );
+    }
+}
+
 void Animator::_axesChanged(){
     //Go through the list of controllers and get the list of available animators.
     //Add any that are not present.
@@ -159,10 +182,12 @@ void Animator::_axesChanged(){
             std::set<AxisInfo::KnownType> zAxes = controller->_getAxesHidden();
             for ( std::set<AxisInfo::KnownType>::iterator it = zAxes.begin();
                     it != zAxes.end(); it++ ){
-                const Carta::Lib::KnownSkyCS& cs = controller->getCoordinateSystem();
-                QString purpose = AxisMapper::getPurpose( *it, cs );
+                QString purpose = AxisMapper::getAnimatorPurpose( *it );
                 QString animId;
-                if ( purpose.length() > 0 ){
+                if(purpose == "Undefined"){
+                    continue;
+                }
+                else if ( purpose.length() > 0 ){
                     addAnimator( purpose, animId );
                     existingAnimators.insert( purpose );
                 }
@@ -176,7 +201,7 @@ void Animator::_axesChanged(){
     for ( int i = 0; i < animCount; i++ ){
         QString animType = m_animators[keys[i]]->getType();
         bool existing = existingAnimators.contains( animType );
-        if ( !existing && animType != Selection::IMAGE ){
+        if ( !existing && animType != Selection::IMAGE && animType != Selection::REGION ){
             m_animators[keys[i]]->setRemoved( true );
             removeAnimator( animType );
         }
@@ -190,6 +215,9 @@ void Animator::changeFrame( int index, const QString& animName ){
         if ( controller != nullptr ){
             if ( animName == Selection::IMAGE ){
                 controller->setFrameImage( index );
+            }
+            else if ( animName == Selection::REGION ){
+            	controller->setFrameRegion( index );
             }
             else {
                 AxisInfo::KnownType axisType = AxisMapper::getType( animName );
@@ -285,6 +313,21 @@ int Animator::getMaxImageCount() const {
             int imageCount = controller->getStackedImageCountVisible();
             if ( maxImages < imageCount ){
                 maxImages = imageCount;
+            }
+        }
+    }
+    return maxImages;
+}
+
+int Animator::getMaxRegionCount() const {
+    int linkCount = m_linkImpl->getLinkCount();
+    int maxImages = 0;
+    for ( int i = 0; i < linkCount; i++ ){
+        Controller* controller = dynamic_cast<Controller*>( m_linkImpl->getLink(i));
+        if ( controller != nullptr ){
+            int regionCount = controller->getRegionCount();
+            if ( maxImages < regionCount ){
+                maxImages = regionCount;
             }
         }
     }
@@ -439,6 +482,12 @@ void Animator::refreshState(){
     m_linkImpl->refreshState();
 }
 
+void Animator::_regionsChanged( Controller* controller ){
+	int selectRegionIndex = controller->getRegionIndexCurrent();
+	_resetAnimationRegion( selectRegionIndex );
+}
+
+
 QString Animator::removeAnimator( const QString& type ){
     QString result;
     if ( m_animators.contains( type )){
@@ -447,10 +496,11 @@ QString Animator::removeAnimator( const QString& type ){
         m_animators[type]->setVisible( false );
         _adjustStateAnimatorTypes();
     }
-    else if ( type != Selection::IMAGE ){
+    else if ( type != Selection::IMAGE && type != Selection::REGION ){
         result= "Error removing animator; unrecognized type="+type;
         Util::commandPostProcess( result);
     }
+
     return result;
 }
 
@@ -471,6 +521,24 @@ QString Animator::removeLink( CartaObject* cartaObject ){
     return result;
 }
 
+void Animator::_resetAnimationRegion( int selectedIndex ){
+    _addRemoveRegionAnimator();
+    if ( m_animators.contains( Selection::REGION) ){
+        int maxRegions = getMaxRegionCount();
+        if ( maxRegions == 0 ){
+            m_animators[Selection::REGION]->setUpperBound( 1 );
+        }
+        else {
+            m_animators[Selection::REGION]->setUpperBound(maxRegions);
+        }
+        if ( selectedIndex >= 0 ){
+            m_animators[Selection::REGION]->setFrame( selectedIndex );
+        }
+
+    }
+    _updateAnimatorBounds();
+}
+
 
 void Animator::_resetAnimationParameters( int selectedImage ){
     _addRemoveImageAnimator();
@@ -483,7 +551,14 @@ void Animator::_resetAnimationParameters( int selectedImage ){
             m_animators[Selection::IMAGE]->setUpperBound(maxImages);
         }
         if ( selectedImage >= 0 ){
-            m_animators[Selection::IMAGE]->setFrame( selectedImage );
+
+            Controller* controller = _getControllerSelected();
+            if (controller != nullptr) {
+                //AddFileListInfo
+                m_animators[Selection::IMAGE]->setFrame( selectedImage, controller->getFileList());
+            } else {
+                m_animators[Selection::IMAGE]->setFrame( selectedImage );
+            }
         }
         else {
             int index = m_animators[Selection::IMAGE]->getFrame();
@@ -590,8 +665,7 @@ bool Animator::_updateAnimatorBound( const QString& key ){
         bool axisFound = false;
         if ( controller != nullptr ){
             for ( int i = 0; i < animAxisCount; i++ ){
-                const Carta::Lib::KnownSkyCS& cs = controller->getCoordinateSystem();
-                QString animPurpose = AxisMapper::getPurpose( animationAxes[i], cs );
+                QString animPurpose = AxisMapper::getAnimatorPurpose( animationAxes[i] );
                 if ( animPurpose == key ){
                     axisFound = true;
                     break;
@@ -620,7 +694,7 @@ void Animator::_updateAnimatorBounds(){
     QList<QString> animKeys =m_animators.keys();
     bool availableChanged = false;
     for ( QString key : animKeys  ){
-        if ( key != Selection::IMAGE ){
+        if ( key != Selection::IMAGE && key != Selection::REGION ){
            bool animAvailable = _updateAnimatorBound( key );
            if ( animAvailable ){
                availableChanged = true;
@@ -637,20 +711,21 @@ void Animator::_updateSupportedZAxes( Controller* controller ){
     std::set<AxisInfo::KnownType> animAxes = controller->_getAxesHidden();
     for ( std::set<AxisInfo::KnownType>::iterator it = animAxes.begin();
         it != animAxes.end(); it++ ){
-        const Carta::Lib::KnownSkyCS& cs = controller->getCoordinateSystem();
-        QString animName = AxisMapper::getPurpose( *it, cs );
-        if ( !m_animators.contains( animName ) && animName.length() > 0 ){
-            QString animId;
-            addAnimator( animName , animId );
-        }
-        else {
-            if ( m_animators.contains( animName ) ){
-                if ( m_animators[animName]->isRemoved( ) ){
-                    m_animators[animName]->setRemoved( false );
-                    if ( controller->getFrameUpperBound(*it) > 0 ){
-                        m_animators[animName]->setVisible( true );
+        QString animName = AxisMapper::getAnimatorPurpose( *it );
+        if(animName != "Undefined"){
+            if ( !m_animators.contains( animName ) && animName.length() > 0 ){
+                QString animId;
+                addAnimator( animName , animId );
+            }
+            else {
+                if ( m_animators.contains( animName ) ){
+                    if ( m_animators[animName]->isRemoved( ) ){
+                        m_animators[animName]->setRemoved( false );
+                        if ( controller->getFrameUpperBound(*it) > 0 ){
+                            m_animators[animName]->setVisible( true );
+                        }
+                        _adjustStateAnimatorTypes();
                     }
-                    _adjustStateAnimatorTypes();
                 }
             }
         }
@@ -660,8 +735,16 @@ void Animator::_updateSupportedZAxes( Controller* controller ){
 void Animator::_updateFrame( Controller* controller, Carta::Lib::AxisInfo::KnownType type ){
     if ( controller ){
         int frameIndex = controller->getFrame( type );
-        const Carta::Lib::KnownSkyCS& cs = controller->getCoordinateSystem();
-        QString animName = AxisMapper::getPurpose( type, cs );
+        // check the new spectral frame index
+        if ( type == AxisInfo::KnownType::SPECTRAL ) {
+             qDebug() << "++++++++ [update spectral frame] Index=" << frameIndex;
+        }
+        // check the new stoke frame index and update it for percentile/colormap settings
+        if ( type == AxisInfo::KnownType::STOKES ) {
+            qDebug() << "++++++++ [update stoke frame] Index=" << frameIndex;
+            controller -> recallClipValue();
+        }
+        QString animName = AxisMapper::getAnimatorPurpose( type );
         if ( m_animators.contains( animName) ){
             int currentIndex = m_animators[animName]->getFrame();
             if ( currentIndex != frameIndex ){
@@ -686,4 +769,3 @@ Animator::~Animator(){
 
 }
 }
-

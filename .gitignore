@@ -24,3 +24,10 @@
 *.swp
 
 *createlinks.sh
+build*/
+
+# license
+PureWeb*.lic
+
+carta.pro.user
+node_modules

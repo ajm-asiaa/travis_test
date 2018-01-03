@@ -6,6 +6,7 @@
 #pragma once
 
 #include <QString>
+#include "CartaLib/IntensityUnitConverter.h"
 
 
 
@@ -21,19 +22,19 @@ public:
 
     /**
      * Returns the intensity corresponding to a given percentile in the current frame.
-     * @param percentile - a number [0,1] for which an intensity is desired.
-     * @param intensity - the computed intensity corresponding to the percentile.
-     * @param intensityIndex - the frame where maximum intensity was found.
-     * @return true if the computed intensity is valid; otherwise false.
+     * @param percentiles - a list of numbers in [0,1] for which an intensity is desired.
+     * @return - a list of corresponding intensity values.
      */
-    virtual bool getIntensity( double percentile, double* intensity, int* intensityIndex ) const = 0;
+    virtual std::vector<double> getIntensity( const std::vector<double>& percentile, Carta::Lib::IntensityUnitConverter::SharedPtr converter=nullptr) const = 0;
 
     /**
-     * Return the percentile corresponding to the given intensity in the current frame.
-     * @param intensity a value for which a percentile is needed.
-     * @return the percentile corresponding to the intensity.
+     * Return the percentiles corresponding to the given intensities.
+     * @param frameLow a lower bound for the channel range or -1 if there is no lower bound.
+     * @param frameHigh an upper bound for the channel range or -1 if there is no upper bound.
+     * @param intensities values for which percentiles are needed.
+     * @return the percentiles corresponding to the intensities.
      */
-    virtual double getPercentile( int frameLow, int frameHigh, double intensity ) const = 0;
+    virtual std::vector<double> getPercentiles( int frameLow, int frameHigh, std::vector<double> intensities, Carta::Lib::IntensityUnitConverter::SharedPtr converter=nullptr ) const = 0;
 
     /**
      * Add a contour set.

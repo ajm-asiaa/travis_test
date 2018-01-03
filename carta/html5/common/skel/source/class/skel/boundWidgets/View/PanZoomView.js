@@ -19,58 +19,100 @@ qx.Class.define( "skel.boundWidgets.View.PanZoomView", {
     {
         this.base( arguments, viewId );
 
-        // monitor mouse move
-        this.addListener( "mousemove", this._mouseMoveCB.bind(this));
-        this.addListener( "mousewheel", this._mouseWheelCB.bind(this));
-        this.addListener( "dblclick", this._mouseDoubleClickCB.bind(this));
+        this.m_viewWidget.m_updateViewCallback = this.viewSizeHandler.bind(this);
+
+        // monitor mouse move, move to DisplayWindowImage.
+        // this.addListener( "mousewheel", this._mouseWheelCB.bind(this));
 
         this.m_viewId = viewId;
         this.m_connector = mImport( "connector");
-
-        var path = skel.widgets.Path.getInstance();
-        this.m_prefix = this.m_viewId + path.SEP+ path.VIEW + path.SEP +"pointer-move";
-        this.m_viewSharedVar = this.m_connector.getSharedVar(this.m_prefix);
+        var qualityValue = this.m_connector.supportsRasterViewQuality() ? 90 : 101;
+        this.setQuality( qualityValue );
     },
 
     members: {
 
-        _mouseMoveCB : function (ev) {
-            var box = this.overlayWidget().getContentLocation( "box" );
-            var pt = {
-                x: ev.getDocumentLeft() - box.left,
-                y: ev.getDocumentTop() - box.top
-            };
-            this.m_viewSharedVar.set( "" + pt.x + " " + pt.y);
-
+        viewSizeHandler: function(width, height) {
+            if (this.m_updateViewCallback) {
+                this.m_updateViewCallback(width, height);
+            }
         },
 
-        _mouseWheelCB : function(ev) {
-            var box = this.overlayWidget().getContentLocation( "box" );
-            var pt = {
-                x: ev.getDocumentLeft() - box.left,
-                y: ev.getDocumentTop() - box.top
-            };
-            //console.log( "vwid wheel", pt.x, pt.y, ev.getWheelDelta());
+        /**
+         * Install an input handler.
+         * @param handlerType {class}
+         *
+         * For example: installHandler( skel.hacks.inputHandlers.Tap)
+         */
+        installHandler: function( handlerType )
+        {
+            if( ! this.m_inputHandlers ) {
+                this.m_inputHandlers = {};
+            }
+            if( this.m_inputHandlers[handlerType] !== undefined ) {
+                console.warn( "Double install of handler" );
+                return;
+            }
+            var handler = new handlerType( this );
+            this.m_inputHandlers[handlerType] = handler;
+        },
+
+        sendPanZoom : function(pt, wheelFactor) {
             var path = skel.widgets.Path.getInstance();
             var cmd = this.m_viewId + path.SEP_COMMAND + path.ZOOM;
+
             this.m_connector.sendCommand( cmd,
-                "" + pt.x + " " + pt.y + " " + ev.getWheelDelta());
+                "" + pt.x + " " + pt.y + " " + wheelFactor);
         },
 
-        _mouseDoubleClickCB : function(ev) {
-            var box = this.overlayWidget().getContentLocation( "box" );
-            var pt = {
-                x: ev.getDocumentLeft() - box.left,
-                y: ev.getDocumentTop() - box.top
-            };
-            //console.log( "vwid click", pt.x, pt.y, ev.getButton());
+        // new command for mouse wheel zooom event, for 1 image, 
+        sendPanZoomLevel : function(pt, level, id) {
+
             var path = skel.widgets.Path.getInstance();
-            var cmd = this.m_viewId + path.SEP_COMMAND + path.CENTER;
+            var cmd = this.m_viewId + path.SEP_COMMAND + "setPanAndZoomLevel";
             this.m_connector.sendCommand( cmd,
-                "" + pt.x + " " + pt.y + " " + ev.getButton(), function(){});
+                "" + pt.x + " " + pt.y + " " + level+" "+ id);
         },
 
-        m_viewId : null
+        // new command for fitToWinowSize and setup minimal zoom level functions.
+        sendZoomLevel: function(level, id) {
+            var path = skel.widgets.Path.getInstance();
+            var cmd = this.m_viewId + path.SEP_COMMAND + "setZoomLevel";
+            this.m_connector.sendCommand( cmd, ""+level+" "+ id);
+        },
+
+        /**
+         * Send an input event to the server side. E.g. mouse hover action
+         * @param e {object}
+         */
+        sendInputEvent: function( e ){
+
+            var params = JSON.stringify( e );
+            var path = skel.widgets.Path.getInstance();
+            var cmd = this.m_viewId + path.SEP_COMMAND + path.INPUT_EVENT;
+            this.m_connector.sendCommand( cmd, params );
+        },
+
+        /**
+         * Install an input handler.
+         * @param handlerType {class}
+         */
+        uninstallHandler: function( handlerType )
+        {
+            if( ! this.m_inputHandlers ) {
+                this.m_inputHandlers = {};
+            }
+            if( this.m_inputHandlers[handlerType] === undefined ) {
+                console.warn( "Cannot uninstall handler" );
+                return;
+            }
+            this.m_inputHandlers[handlerType].deactivate();
+            delete this.m_inputHandlers[handlerType];
+        },
+
+        m_viewId : null,
+        m_inputHandlers : null,
+        m_updateViewCallback: null
 
     }
 } );

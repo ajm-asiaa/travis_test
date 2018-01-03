@@ -13,6 +13,7 @@ qx.Class.define("skel.widgets.Path", {
         this.CLIPS = this.BASE_PATH + "Clips";
         this.COLORMAPS = this.BASE_PATH + "Colormaps";
         this.CONTOUR_GENERATE_MODES = this.BASE_PATH + "ContourGenerateModes";
+        this.CONTOUR_TYPE_MODES = this.BASE_PATH + "ContourTypes";
         this.CONTOUR_LINE_STYLES = this.BASE_PATH + "ContourStyles";
         this.CONTOUR_SPACING_MODES = this.BASE_PATH + "ContourSpacingModes";
         this.COORDINATE_SYSTEMS = this.BASE_PATH + "CoordinateSystems";
@@ -36,6 +37,7 @@ qx.Class.define("skel.widgets.Path", {
         this.PROFILE_GEN_MODES = this.BASE_PATH + "GenerateModes";
         this.PROFILE_STATISTICS = this.BASE_PATH + "ProfileStatistics";
         this.REGION = this.BASE_PATH + this.REGION_DATA + this.SEP;
+        this.REGION_TYPES = this.BASE_PATH + "RegionTypes";
         this.SETTINGS = this.BASE_PATH + "Settings";
         this.SNAPSHOTS = this.BASE_PATH + "Snapshots";
         this.SPECTRAL_UNITS = this.BASE_PATH + "UnitsSpectral";
@@ -57,9 +59,9 @@ qx.Class.define("skel.widgets.Path", {
         AUTO_CLIP : "setAutoClip",
         BASE_PATH : "",
         CARTA : "CartaObjects",
-        CASA_LOADER : "CasaImageLoader",
+        CASA_LOADER : "ImageViewer",
         CHANNEL_UNITS : "",
-        CENTER : "center",
+        //CENTER : "center",
         CLIP_VALUE : "setClipValue",
         CLIPS : "",
         CLOSE_IMAGE : "closeImage",
@@ -67,6 +69,7 @@ qx.Class.define("skel.widgets.Path", {
         COLORMAP_PLUGIN : "Colormap",
         COLORMAPS : "",
         CONTOUR_GENERATE_MODES : "",
+        CONTOUR_TYPE_MODES : "",
         CONTOUR_LINE_STYLES : "",
         CONTOUR_SPACING_MODES : "",
         COORDINATE_SYSTEMS : "",
@@ -74,13 +77,17 @@ qx.Class.define("skel.widgets.Path", {
         DATA_COUNT : "",
         DATA_LOADER : "DataLoader",
         ERROR_HANDLER : "",
+        FIT : "fit",
         FONTS : "",
         GAMMA : "",
         GRID_PLUGIN : "GridControls",
         HIDDEN : "Hidden",
         HIDE_IMAGE : "hideImage",
         HISTOGRAM_PLUGIN : "Histogram",
+        IMAGE_CONTEXT : "ImageContext",
+        IMAGE_ZOOM : "ImageZoom",
         IMAGE_DATA : "image",
+        INPUT_EVENT : "inputEvent",
         INTENSITY_UNITS : "",
         LABEL_FORMATS : "",
         LAYER_COMPOSITION_MODES : "",
@@ -102,6 +109,7 @@ qx.Class.define("skel.widgets.Path", {
         PROFILE : "Profiler",
         REGION : "",
         REGION_DATA : "region",
+        REGION_TYPES : "",
         SEP : "/",
         SEP_COMMAND : ":",
         SETTINGS : "",
@@ -176,15 +184,6 @@ qx.Class.define("skel.widgets.Path", {
         getCommandClearLayout : function(){
             return this.BASE_PATH + this.VIEW_MANAGER + this.SEP_COMMAND + "clearLayout";
         },
-        
-        /**
-         * Notify the server that state updates are needed.
-         */
-        getCommandRefreshState : function(){
-            return this.BASE_PATH + this.VIEW_MANAGER + this.SEP_COMMAND + "refreshState";
-        },
-        
-        
         
         /**
          * Returns the command to register snapshots.

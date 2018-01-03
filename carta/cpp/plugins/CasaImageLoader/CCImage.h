@@ -34,15 +34,15 @@ public:
 //    }
 
     /**
-     * Returns a pointer to the underlying casa::LatticeBase* or null if there is no underlying
+     * Returns a pointer to the underlying casacore::LatticeBase* or null if there is no underlying
      * casacore image.
-     * @return casa::LatticeBase *
+     * @return casacore::LatticeBase *
      */
-    virtual casa::LatticeBase * getCasaImage() = 0;
+    virtual casacore::LatticeBase * getCasaImage() = 0;
 
-    virtual casa::ImageInfo getImageInfo() const = 0;
+    virtual casacore::ImageInfo getImageInfo() const = 0;
 
-//    virtual casa::ImageInterface<casa::Float> * getCasaIIfloat() = 0;
+//    virtual casacore::ImageInterface<casacore::Float> * getCasaIIfloat() = 0;
 
 
 };
@@ -86,31 +86,31 @@ public:
         }
 
         //Convert to a CASA data type.
-        casa::Vector<int> newOrder( indexCount );
+        casacore::Vector<int> newOrder( indexCount );
         for ( int i = 0; i < indexCount; i++ ){
             newOrder[i] = indices[i];
         }
         //Change the order of the axes in the coordinate system
-        casa::CoordinateSystem coordSys = m_casaII->coordinates();
+        casacore::CoordinateSystem coordSys = m_casaII->coordinates();
         coordSys.transpose( newOrder, newOrder );
-        casa::IPosition oldShape = m_casaII->shape();
-        casa::IPosition newShape( indexCount );
+        casacore::IPosition oldShape = m_casaII->shape();
+        casacore::IPosition newShape( indexCount );
         for ( int i = 0; i < indexCount; i++ ){
             newShape[i] = oldShape[newOrder[i]];
         }
 
         //Make a new image and copy the data into it.
-        casa::ImageInterface<PType>* newImage = new casa::TempImage<PType>(casa::TiledShape( newShape), coordSys);
-        casa::Array<PType> dataCopy = m_casaII->get();
+        casacore::ImageInterface<PType>* newImage = new casacore::TempImage<PType>(casacore::TiledShape( newShape), coordSys);
+        casacore::Array<PType> dataCopy = m_casaII->get();
         newImage->put( reorderArray( dataCopy, newOrder ));
         if ( m_casaII->hasPixelMask()){
-            std::unique_ptr<casa::Lattice<casa::Bool> > maskLattice( m_casaII->pixelMask().clone());
-            casa::Array<casa::Bool> maskCopy = maskLattice->get();
-            dynamic_cast< casa::TempImage<PType> *>(newImage)->attachMask( casa::ArrayLattice<casa::Bool>(reorderArray( maskCopy, newOrder )));
+            std::unique_ptr<casacore::Lattice<casacore::Bool> > maskLattice( m_casaII->pixelMask().clone());
+            casacore::Array<casacore::Bool> maskCopy = maskLattice->get();
+            dynamic_cast< casacore::TempImage<PType> *>(newImage)->attachMask( casacore::ArrayLattice<casacore::Bool>(reorderArray( maskCopy, newOrder )));
         }
 
         //Finish the copy and create a CARTA image with permuted axes.
-        casa::ImageUtilities::copyMiscellaneous( *newImage, *m_casaII );
+        casacore::ImageUtilities::copyMiscellaneous( *newImage, *m_casaII );
         std::shared_ptr<Carta::Lib::Image::ImageInterface> permuteImage =  create( newImage);
         return permuteImage;
     }
@@ -125,6 +125,13 @@ public:
     hasMask() const override
     {
         return false;
+    }
+
+    virtual bool
+    hasBeam() const override
+    {
+        casacore::ImageInfo imagef = m_casaII->imageInfo();
+        return imagef.hasBeam();
     }
 
     virtual bool
@@ -179,10 +186,10 @@ public:
 
     /// call this to create an instance of this class, do not use constructor
     static CCImage::SharedPtr
-    create( casa::ImageInterface < PType > * casaImage )
+    create( casacore::ImageInterface < PType > * casaImage )
     {
         // create an image interface instance and populate it with various
-        // values from casa::ImageInterface
+        // values from casacore::ImageInterface
         CCImage::SharedPtr img = std::make_shared < CCImage < PType > > ();
         img-> m_pixelType = Carta::Lib::Image::CType2PixelType < PType >::type;
         img-> m_dims      = casaImage-> shape().asStdVector();
@@ -194,32 +201,55 @@ public:
         htmlTitle = htmlTitle.toHtmlEscaped();
 
         // make our own copy of the coordinate system using 'clone'
-        std::shared_ptr<casa::CoordinateSystem> casaCS(
-                    static_cast<casa::CoordinateSystem *> (casaImage->coordinates().clone()));
+        std::shared_ptr<casacore::CoordinateSystem> casaCS(
+                    static_cast<casacore::CoordinateSystem *> (casaImage->coordinates().clone()));
 
         // construct a meta data instance
         img-> m_meta = std::make_shared < CCMetaDataInterface > ( htmlTitle, casaCS );
 
+        /// \todo remove this test code
+       /* casacore::Record rec;
+        if( ! casaCS-> save( rec, "")) {
+            std::string err = casaCS-> errorMessage();
+            qWarning() << "Could not serialize coordinate system";
+        }
+        else {
+            rec.print( std::cerr);
+            casacore::AipsIO os("/tmp/file.name", casacore::ByteIO::New);
+            rec.putRecord( os);
+        }*/
+
         return img;
     } // create
 
-    virtual casa::LatticeBase *
+    virtual casacore::LatticeBase *
     getCasaImage() override
     {
         return m_casaII;
     }
 
-    casa::ImageInfo getImageInfo() const {
+    casacore::ImageInfo getImageInfo() const override{
                return m_casaII->imageInfo();
            }
 
     virtual
-    ~CCImage() { }
+    ~CCImage() {
+        if(m_casaII != nullptr)
+        {
+            delete m_casaII;
+            m_casaII = nullptr;
+        }
+
+        //qDebug() << "~CCImage is getting called";
+    }
 
     /// do not use this!
     /// \todo constructor should be protected... but I don't have time to fix the
     /// compiler errors (Pavol)
-    CCImage() { }
+    CCImage()
+    {
+        m_casaII = nullptr;
+    }
 
 protected:
     /// type of the image data
@@ -228,8 +258,8 @@ protected:
     /// cached dimensions of the image
     std::vector < int > m_dims;
 
-    /// pointer to the actual casa::ImageInterface
-    casa::ImageInterface < PType > * m_casaII;
+    /// pointer to the actual casacore::ImageInterface
+    casacore::ImageInterface < PType > * m_casaII;
 
     /// cached unit
     Carta::Lib::Unit m_unit;
@@ -243,5 +273,5 @@ protected:
 };
 
 /// helper to convert carta's image to casacore image interface
-casa::ImageInterface<casa::Float> *
+casacore::ImageInterface<casacore::Float> *
 cartaII2casaII_float( std::shared_ptr<Carta::Lib::Image::ImageInterface> ii) ;

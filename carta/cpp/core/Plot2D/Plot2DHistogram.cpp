@@ -1,5 +1,6 @@
 #include "Plot2DHistogram.h"
 #include "Data/Histogram/PlotStyles.h"
+#include "Data/Plotter/LegendLocations.h"
 #include <qwt_painter.h>
 #include "CartaLib/PixelPipeline/CustomizablePixelPipeline.h"
 #include <QDebug>
@@ -111,17 +112,30 @@ void Plot2DHistogram::setData ( std::vector<std::pair<double,double> > dataVecto
     int dataCount = dataVector.size();
     m_maxValueY = -1;
     m_minValueY = std::numeric_limits<double>::max();
+    m_maxValueX = -1;
+    m_minValueX = std::numeric_limits<double>::max();
     m_data.clear();
-    for ( int i = 0; i < dataCount-1; i++ ){
+    // use a fake bin width to plot when bin count equals 1
+    double binHalfWidth = 1.0;
+    if ( dataVector.size() > 1 ){
+        binHalfWidth = (dataVector[1].first - dataVector[0].first)/2.0;
+    }
+    for ( int i = 0; i < dataCount; i++ ){
         //Only add in nonzero counts
         if ( dataVector[i].second > 0 ){
-            QwtIntervalSample sample( dataVector[i].second, dataVector[i].first, dataVector[i+1].first );
+            QwtIntervalSample sample( dataVector[i].second, dataVector[i].first-binHalfWidth, dataVector[i].first+binHalfWidth );
             m_data.push_back( sample );
             if ( dataVector[i].second > m_maxValueY ){
                 m_maxValueY = dataVector[i].second;
             }
             if ( dataVector[i].second < m_minValueY ){
                 m_minValueY = dataVector[i].second;
+            }
+            if ( dataVector[i].first > m_maxValueX ){
+                m_maxValueX = dataVector[i].first;
+            }
+            if ( dataVector[i].first < m_minValueX ){
+                m_minValueX = dataVector[i].first;
             }
         }
     }
@@ -135,4 +149,3 @@ Plot2DHistogram::~Plot2DHistogram(){
 
 }
 }
-	

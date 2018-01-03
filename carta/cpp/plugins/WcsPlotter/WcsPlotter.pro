@@ -10,7 +10,6 @@ CONFIG += plugin
 SOURCES += \
     grfdriver.cpp \
     FitsHeaderExtractor.cpp \
-    SimpleFitsParser.cpp \
     WcsPlotterPlugin.cpp \
     AstGridPlotter.cpp \
     AstWcsGridRenderService.cpp
@@ -18,7 +17,6 @@ SOURCES += \
 HEADERS += \
     grfdriver.h \
     FitsHeaderExtractor.h \
-    SimpleFitsParser.h \
     WcsPlotterPlugin.h \
     AstGridPlotter.h \
     AstWcsGridRenderService.h
@@ -29,12 +27,23 @@ astlibLIBS += $${ASTLIBDIR}/lib/libast_grf3d.a
 astlibLIBS += $${ASTLIBDIR}/lib/libast_pass2.a
 astlibLIBS += $${ASTLIBDIR}/lib/libast_err.a
 
-casacoreLIBS += -L$${CASACOREDIR}/lib
-casacoreLIBS += -lcasa_images -lcasa_coordinates -lcasa_fits -lcasa_measures
-casacoreLIBS += -lcasa_lattices -lcasa_tables -lcasa_scimath -lcasa_scimath_f -lcasa_mirlib
-casacoreLIBS += -lcasa_casa -llapack -lblas -ldl
+unix:macx {
+  casacoreLIBS += -L$${CASACOREDIR}/lib
+  casacoreLIBS += -lcasa_images -lcasa_coordinates -lcasa_fits -lcasa_measures
+  casacoreLIBS += -lcasa_lattices -lcasa_tables -lcasa_scimath -lcasa_scimath_f -lcasa_mirlib
+  casacoreLIBS += -lcasa_casa -llapack -lblas -ldl
 
-LIBS += $${casacoreLIBS}
+  LIBS += $${casacoreLIBS}
+}
+else{
+#casacoreLIBS += -L$${CASACOREDIR}/lib
+#casacoreLIBS += -lcasa_images -lcasa_coordinates -lcasa_fits -lcasa_measures
+#casacoreLIBS += -lcasa_lattices -lcasa_tables -lcasa_scimath -lcasa_scimath_f -lcasa_mirlib
+#casacoreLIBS += -lcasa_casa -llapack -lblas -ldl
+
+#LIBS += $${casacoreLIBS}
+}
+
 LIBS += $${astlibLIBS}
 LIBS += -L$$OUT_PWD/../../core/ -lcore
 LIBS += -L$$OUT_PWD/../../CartaLib/ -lCartaLib
@@ -65,4 +74,11 @@ unix:macx {
 }
 else{
     PRE_TARGETDEPS += $$OUT_PWD/../../core/libcore.so
+}
+
+unix:!macx {
+  QMAKE_RPATHDIR=$$OUT_PWD/../../../../../CARTAvis-externals/ThirdParty/casa/trunk/linux/lib
+}
+else {
+
 }

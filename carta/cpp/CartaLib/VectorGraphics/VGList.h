@@ -117,6 +117,37 @@ private:
     QPolygonF m_poly;
 };
 
+
+
+/// polyline entry implementation
+class DrawPolygon : public IVGListEntry
+{
+    CLASS_BOILERPLATE( DrawPolygon );
+
+public:
+
+    DrawPolygon( const QPolygonF & poly )
+    {
+        m_poly = poly;
+    }
+
+    virtual void
+    cplusplus( BetterQPainter & painter ) override
+    {
+        painter.drawPolygon( m_poly );
+    }
+
+    virtual QStringList
+    javascript() override
+    {
+        return QStringList()
+               << QString( "p.polygon(not implemented yet);" );
+    }
+
+private:
+
+    QPolygonF m_poly;
+};
 /// set pen width implementation
 class SetPenWidth : public IVGListEntry
 {
@@ -431,6 +462,40 @@ private:
     QRectF m_rect = QRectF( 0, 0, 10, 10 );
 };
 
+/// draw an ellipse filled with current brush and outlined with current pen
+class DrawEllipse : public IVGListEntry
+{
+    CLASS_BOILERPLATE( DrawEllipse );
+
+public:
+
+    DrawEllipse( const QRectF & rect)
+    {
+        m_rect = rect;
+    }
+
+    virtual void
+    cplusplus( BetterQPainter & painter ) override
+    {
+        painter.drawEllipse( m_rect);
+    }
+
+    virtual QStringList
+    javascript() override
+    {
+        return QStringList()
+               << QString( "p.drawEllipse(%1,%2,%3,%4);" )
+                   .arg( m_rect.left() )
+                   .arg( m_rect.right() )
+                   .arg( m_rect.width() )
+                   .arg( m_rect.height() );
+    }
+
+private:
+
+    QRectF m_rect = QRectF( 0, 0, 10, 10 );
+};
+
 /// draw text
 class DrawText : public IVGListEntry
 {
@@ -645,11 +710,11 @@ public:
     VGList();
 
     /// copy constructor
-    VGList( const VGList & other ) = default;
+    VGList( const VGList & ) = default;
 
     /// assignment operator
     VGList &
-    operator= ( const VGList & other ) = default;
+    operator= ( const VGList & ) = default;
 
     ~VGList();
 

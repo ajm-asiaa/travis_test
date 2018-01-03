@@ -22,6 +22,7 @@ SpectralConversionPlugin::handleHook( BaseHook & hookData ){
     else if ( hookData.is < Carta::Lib::Hooks::ConversionSpectralHook > () ) {
         Carta::Lib::Hooks::ConversionSpectralHook & hook
             = static_cast < Carta::Lib::Hooks::ConversionSpectralHook & > ( hookData );
+        bool success = false;
         std::shared_ptr<Carta::Lib::Image::ImageInterface> image = hook.paramsPtr->m_dataSource;
         if ( image ){
             QString newUnits = hook.paramsPtr->m_newUnit;
@@ -36,19 +37,19 @@ SpectralConversionPlugin::handleHook( BaseHook & hookData ){
                     Carta::Lib::Image::MetaDataInterface::SharedPtr metaPtr = base->metaData();
                     CCMetaDataInterface* metaData = dynamic_cast<CCMetaDataInterface*>(metaPtr.get());
                     if ( metaData ){
-                        std::shared_ptr<casa::CoordinateSystem> cs = metaData->getCoordinateSystem();
-                        int spectralIndex = cs->findCoordinate(casa::Coordinate::SPECTRAL,  -1);
+                        std::shared_ptr<casacore::CoordinateSystem> cs = metaData->getCoordinateSystem();
+                        int spectralIndex = cs->findCoordinate(casacore::Coordinate::SPECTRAL,  -1);
                         if ( spectralIndex >= 0 ){
-                            casa::SpectralCoordinate sc = cs->spectralCoordinate( spectralIndex );
+                            casacore::SpectralCoordinate sc = cs->spectralCoordinate( spectralIndex );
                             std::vector<double> inputValues = hook.paramsPtr->m_inputList;
                             int dataCount = inputValues.size();
-                            casa::Vector<double> inputs( dataCount );
+                            casacore::Vector<double> inputs( dataCount );
                             for ( int i = 0; i < dataCount; i++ ){
                                 inputs[i] = inputValues[i];
                             }
                             std::vector<double> resultValues;
                             if ( !newUnits.isEmpty() ){
-                                casa::Vector<double> outputs = converter->convert( inputs, sc );
+                                casacore::Vector<double> outputs = converter->convert( inputs, sc );
                                 resultValues = outputs.tovector();
                             }
                             else {
@@ -61,17 +62,20 @@ SpectralConversionPlugin::handleHook( BaseHook & hookData ){
                                 }
                             }
                             hook.result = resultValues;
+                            success = true;
                         }
                         else {
-                            qDebug() << "Not converting spectral units, no spectral coordinate";
+                            qWarning() << "Not converting spectral units, no spectral coordinate";
                         }
                     }
                 }
                 delete converter;
+            } else {
+                qWarning() << "Cannot find a converter from" << oldUnits << "to" << newUnits;
             }
         }
 
-        return true;
+        return success;
     }
     qWarning() << "Spectral conversion doesn't know how to handle this hook";
     return false;

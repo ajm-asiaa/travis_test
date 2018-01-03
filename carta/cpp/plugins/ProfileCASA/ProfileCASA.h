@@ -4,15 +4,16 @@
 #pragma once
 
 #include "CartaLib/IPlugin.h"
-#include "CartaLib/RegionInfo.h"
 #include "CartaLib/ProfileInfo.h"
+#include "CartaLib/Regions/IRegion.h"
 #include "CartaLib/Hooks/ProfileResult.h"
 #include "plugins/CasaImageLoader/CCImage.h"
 #include <imageanalysis/ImageAnalysis/ImageCollapserData.h>
 
 #include <QObject>
 
-namespace casa {
+
+namespace casacore {
     class ImageRegion;
 }
 
@@ -32,16 +33,23 @@ public:
     virtual bool handleHook(BaseHook & hookData) override;
     virtual std::vector<HookId> getInitialHookList() override;
     virtual ~ProfileCASA();
+
 private:
-    casa::MFrequency::Types _determineRefFrame(
-            std::shared_ptr<casa::ImageInterface<casa::Float> > img ) const;
-    Carta::Lib::Hooks::ProfileResult _generateProfile( casa::ImageInterface < casa::Float > * imagePtr,
-            Carta::Lib::RegionInfo regionInfo, Carta::Lib::ProfileInfo profileInfo ) const;
+
+    casacore::MFrequency::Types _determineRefFrame(
+            std::shared_ptr<casacore::ImageInterface<casacore::Float> > img ) const;
+    Carta::Lib::Hooks::ProfileResult _generateProfile( casacore::ImageInterface < casacore::Float > * imagePtr,
+            std::shared_ptr<Carta::Lib::Regions::RegionBase> regionInfo, Carta::Lib::ProfileInfo profileInfo ) const;
     casa::ImageCollapserData::AggregateType _getCombineMethod( Carta::Lib::ProfileInfo profileInfo ) const;
-    casa::ImageRegion* _getEllipsoid(const casa::CoordinateSystem& cSys,
-            const casa::Vector<casa::Double>& x, const casa::Vector<casa::Double>& y) const;
-    casa::ImageRegion* _getPolygon(const casa::CoordinateSystem& cSys,
-            const casa::Vector<casa::Double>& x, const casa::Vector<casa::Double>& y) const;
-    casa::Record _getRegionRecord( Carta::Lib::RegionInfo::RegionType shape, const casa::CoordinateSystem& cSys,
-            const casa::Vector<casa::Double>& x, const casa::Vector<casa::Double>& y) const;
+    casacore::ImageRegion* _getEllipsoid(const casacore::CoordinateSystem& cSys,
+            const casacore::Vector<casacore::Double>& x, const casacore::Vector<casacore::Double>& y) const;
+    casacore::ImageRegion* _getPolygon(const casacore::CoordinateSystem& cSys,
+            const casacore::Vector<casacore::Double>& x, const casacore::Vector<casacore::Double>& y) const;
+    casacore::Record _getRegionRecord( const QString& shape, const casacore::CoordinateSystem& cSys,
+            const casacore::Vector<casacore::Double>& x, const casacore::Vector<casacore::Double>& y) const;
+
+    casacore::Vector<casacore::Double> _toWorld( const casacore::CoordinateSystem& cSys,
+    		double x, double y, bool* successful ) const;
+    const QString PIXEL_UNIT;
+    const QString RADIAN_UNIT;
 };

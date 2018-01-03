@@ -368,6 +368,11 @@ public:
         return m_coordinateFormatter;
     }
 
+    std::pair<double,QString> getRestFrequency() const override {
+    	std::pair<double,QString> restFreq(0,"");
+    	return restFreq;
+    }
+
     virtual PlotLabelGeneratorInterface::SharedPtr
     plotLabelGenerator() override
     {
@@ -394,6 +399,8 @@ public:
                << "This is a qimage";
     }
 
+    virtual Carta::Lib::Regions::ICoordSystemConverter::SharedPtr getCSConv() override;
+
 private:
 
     Carta::Lib::HtmlString m_title;
@@ -407,6 +414,11 @@ class QImageII
       , public std::enable_shared_from_this < QImageII >
 {
 public:
+
+    virtual bool hasBeam() const override
+    {
+        return false;
+    }
 
     static std::shared_ptr < QImageII >
     load( QString fname )
@@ -438,7 +450,7 @@ public:
     }
 
     virtual std::shared_ptr<Carta::Lib::Image::ImageInterface>
-            getPermuted(const std::vector<int> & /*indices*/){
+            getPermuted(const std::vector<int> & /*indices*/) override {
             qFatal( "Not implemented");
         }
 
@@ -588,4 +600,14 @@ QImagePlugin::getInitialHookList()
                Initialize::staticId,
                LoadAstroImage::staticId
     };
+}
+
+Carta::Lib::Regions::ICoordSystemConverter::SharedPtr QImageMDI::getCSConv() {
+    int ndim =  m_ii-> dims().size();
+    auto ptr = Carta::Lib::Regions::makePixelIdentityConverter( ndim);
+    Carta::Lib::Regions::ICoordSystemConverter::SharedPtr sptr( std::move(ptr));
+    return sptr;
+
+//    return std::make_shared< Carta::Lib::Regions::DefaultCoordSystemConverter>(ndim);
+//    return std::make_shared< Carta::Lib::Regions::PixelIdentityCSConverter>(ndim);
 }

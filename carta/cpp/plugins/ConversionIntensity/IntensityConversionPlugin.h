@@ -18,17 +18,11 @@ public:
      * Constructor.
      */
     IntensityConversionPlugin( QObject * parent = 0 );
-    virtual bool
-    handleHook( BaseHook & hookData ) override;
-
-    virtual std::vector < HookId >
-    getInitialHookList() override;
-
+    
+    virtual bool handleHook( BaseHook & hookData ) override;
+    virtual std::vector < HookId > getInitialHookList() override;
     virtual ~IntensityConversionPlugin();
 
 private:
-    void _getBeamInfo( casa::ImageInfo& information,
-            casa::Double& beamAngle, casa::Double& beamArea) const;
-
 
 };

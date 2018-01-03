@@ -10,17 +10,19 @@ branches:
     - develop 
 
 before_install:
-  - docker pull ajmasiaa/centos7-carta-server-18-10-2017
-  - docker ps -a
-  - docker run -d -p 8080:8080 -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
-  - docker ps -a
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/carta/html5/common/skel"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "./generate.py source-all > /dev/null"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "mkdir /cartabuild/CARTAvis/build"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "qmake CARTA_BUILD_TYPE=dev ../carta -r"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "make -j 2"
+  - pwd
+  - ls -sort
+#  - docker pull ajmasiaa/centos7-carta-server-18-10-2017
+#  - docker ps -a
+#  - docker run -d -p 8080:8080 -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+#  - docker ps -a
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/carta/html5/common/skel"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "./generate.py source-all > /dev/null"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "mkdir /cartabuild/CARTAvis/build"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "qmake CARTA_BUILD_TYPE=dev ../carta -r"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "make -j 2"
 
 

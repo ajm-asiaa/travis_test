@@ -13,6 +13,9 @@ before_install:
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
   - docker run -p 8080:8080 -ti -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+  - docker ps -a
+  - docker run ajmasiaa/centos7-carta-server-18-10-2017 -c "cd /cartabuild/CARTAvis"
+  - ls
 
 script:
   - echo "Building CARTA"

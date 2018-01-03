@@ -1,7 +1,7 @@
-# .travis-ci script to build Linux version of CARTA using a docker image
-
 sudo: required
+
 os: osx
+
 language: ruby
 
 services:

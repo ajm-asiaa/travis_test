@@ -2,12 +2,16 @@ sudo: required
 
 os: osx
 
-language: ruby
+language: cpp
 
 services:
   - docker
 
-before_install:
+branches:
+  only:
+    - develop 
+
+install:
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker run -d -p 127.0.0.1:80:4567 -v $HOME/build/CARTAvis:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a

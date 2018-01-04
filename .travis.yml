@@ -23,10 +23,13 @@ before_install:
   - docker run -d -p 8080:8080 -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis"
+  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd cartabuild"
+  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
+  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd CARTAvis"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/carta/html5/common/skel"
+  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "./generate.py source-all > /dev/null"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "mkdir /cartabuild/CARTAvis/build"
   - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build"

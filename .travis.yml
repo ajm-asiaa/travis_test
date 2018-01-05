@@ -21,7 +21,13 @@ before_install:
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
 #  - docker run -d -p 8080:8080 -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
-  - docker run -ti -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+#  - docker run -ti -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+  - docker run --name carta_build -v $PWD:/cartabuild/CARTAvis -dit ajmasiaa/centos7-carta-server-18-10-2017
+  - docker exec -it carta_build bash -l
+  - su - travis
+  - ls
+  - cd /cartabuild/CARTAvis
+  - ls
 #  - docker ps -a
 #  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
 #  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd cartabuild"
@@ -35,8 +41,5 @@ before_install:
 #  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build && make -j 2"
 
 script:
-  - pwd
-  - ls
-  - cd /cartabuild/CARTAvis
-  - ls
+  - ls -sort
 

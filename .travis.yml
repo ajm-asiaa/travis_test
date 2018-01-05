@@ -20,20 +20,23 @@ before_install:
   - echo $PWD
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
-  - docker run -d -p 8080:8080 -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
-  - docker ps -a
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd cartabuild"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd CARTAvis"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/carta/html5/common/skel"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "./generate.py source-all > /dev/null"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "mkdir /cartabuild/CARTAvis/build"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "qmake CARTA_BUILD_TYPE=dev ../carta -r"
-  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "make -j 2"
+#  - docker run -d -p 8080:8080 -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+  - docker run -ti -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017
+#  - docker ps -a
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd cartabuild"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd CARTAvis"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "ls"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "./cartabuild/CARTAvis/carta/html5/common/skel/generate.py source-all > /dev/null"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "mkdir /cartabuild/CARTAvis/build"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build && qmake CARTA_BUILD_TYPE=dev ../carta -r"
+#  - docker run ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "cd /cartabuild/CARTAvis/build && make -j 2"
 
+script:
+  - pwd
+  - ls
+  - cd /cartabuild/CARTAvis
+  - ls
 

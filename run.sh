@@ -93,8 +93,11 @@ cd /tmp
 
 ls -sort
 
-cd /tmp/carta-7.7.7/
+tar -czvf carta-centos7-test.tar.gz carta-7.7.7
 
-ls -sort
+mv carta-centos7-test.tar.gz /cartabuild/CARTAvis
 
+cd /cartabuild/CARTAvis
+
+ls
 

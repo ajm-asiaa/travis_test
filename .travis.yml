@@ -20,6 +20,5 @@ before_install:
   - echo $PWD
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
-  - docker run --name carta_build -v $PWD:/cartabuild/CARTAvis -dit ajmasiaa/centos7-carta-server-18-10-2017
-  - docker exec -it carta_build ls && ./cartabuild/CARTAvis/carta/html5/common/skel/generate.py source-all > /dev/null && mkdir /cartabuild/CARTAvis/build && cd /cartabuild/CARTAvis/build && export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH && make -j 2
+  - docker run -ti -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "/cartabuild/CARTAvis/run.sh"
 

@@ -21,9 +21,14 @@ before_install:
   - docker pull ajmasiaa/centos7-carta-server-18-10-2017
   - docker ps -a
   - docker run -ti -v $PWD:/cartabuild/CARTAvis ajmasiaa/centos7-carta-server-18-10-2017 /bin/sh -c "chmod 755 /cartabuild/CARTAvis/run.sh && /cartabuild/CARTAvis/run.sh"
-  - cd ~
-  - pwd
+
+script:
+  - cd $HOME/build/ajm-asiaa/CARTAvis/build
   - ls -sort
-  - cd /home/travis/build/ajm-asiaa/CARTAvis
-  - ls -sort
+# Temporarily call is Carta.dmg to make it readily compatible with Grimmer's gdrive_uploader
+  - mv carta-centos7-test.tar.gz Carta.dmg
+  - git clone https://github.com/CARTAvis/gdrive_uploader.git
+ - if [ -e "$HOME/build/CARTAvis/build/Carta.dmg" ]; then echo "dmg exist"; mv $HOME/build/CARTAvis/build/Carta.dmg ./gdrive_uploader/;cd gdrive_uploader;npm install;npm start;else echo "no dmg there"; fi
+
+
 

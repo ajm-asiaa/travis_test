@@ -95,9 +95,9 @@ ls -sort
 
 tar -czvf carta-centos7-test.tar.gz carta-7.7.7
 
-mv carta-centos7-test.tar.gz /cartabuild/CARTAvis
+mv carta-centos7-test.tar.gz /cartabuild/CARTAvis/build
 
-cd /cartabuild/CARTAvis
+cd /cartabuild/CARTAvis/build
 
 ls
 

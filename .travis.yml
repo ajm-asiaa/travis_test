@@ -27,5 +27,10 @@ script:
   - ls -sort
   - sudo mv carta-centos7-test.tar.gz Carta.dmg
   - sudo git clone https://github.com/CARTAvis/gdrive_uploader.git
-  - if [ -e "$HOME/build/CARTAvis/build/Carta.dmg" ]; then echo "dmg exist"; sudo mv $HOME/build/CARTAvis/build/Carta.dmg ./gdrive_uploader/;cd gdrive_uploader;npm install;npm start;else echo "no dmg there"; fi
+  - ls
+  - sudo ./gdrive_uploader/
+  - cd gdrive_uploader
+  - node --version
+  - npm install
+  - npm start
 

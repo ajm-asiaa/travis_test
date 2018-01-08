@@ -28,9 +28,10 @@ script:
   - sudo mv carta-centos7-test.tar.gz Carta.dmg
   - sudo git clone https://github.com/CARTAvis/gdrive_uploader.git
   - ls
-  - sudo ./gdrive_uploader/
+#  - sudo chmod -R 777 gdrive_uploader
   - cd gdrive_uploader
+  - ls
   - node --version
-  - npm install
-  - npm start
+  - sudo npm install
+  - sudo npm start
 

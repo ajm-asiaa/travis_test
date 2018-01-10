@@ -27,8 +27,8 @@ script:
   - ls -sort
   - sudo git clone https://github.com/ajm-asiaa/gdrive_uploader_linux.git
   - ls
-  - sudo chmod -R 777 gdrive_uploader
-  - cd gdrive_uploader
+  - sudo chmod -R 777 gdrive_uploader_linux
+  - cd gdrive_uploader_linux
   - ls
   - node --version
   - npm install

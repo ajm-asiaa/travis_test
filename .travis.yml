@@ -30,7 +30,7 @@ script:
   - sudo chmod -R 777 gdrive_uploader_linux
   - cd gdrive_uploader_linux
   - ls
-  - mv ../carta-centos7-test.tar.gz .
+  - sudo mv ../carta-centos7-test.tar.gz .
   - ls
   - node --version
   - npm install

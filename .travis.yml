@@ -26,12 +26,12 @@ script:
   - cd $HOME/build/ajm-asiaa/CARTAvis/build
   - ls -sort
   - sudo git clone https://github.com/ajm-asiaa/gdrive_uploader_linux.git
-  - ls
+  - ls -sort
   - sudo chmod -R 777 gdrive_uploader_linux
   - cd gdrive_uploader_linux
-  - ls
+  - ls -sort
   - sudo mv ../carta-centos7-test.tar.gz .
-  - ls
+  - ls -sort
   - node --version
   - npm install
   - npm start

@@ -16,7 +16,7 @@ cd build
 
 qmake NOSERVER=1 CARTA_BUILD_TYPE=dev ../carta -r
 
-make -j 2
+make -j 4
 
 echo "Packaging now"
 #svn export https://github.com/CARTAvis/deploytask/trunk/final_centos7_packaging_steps.sh

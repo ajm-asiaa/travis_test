@@ -4,6 +4,9 @@ echo "Test: Running run.sh script"
 
 export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
 
+cd /usr/bin
+ln -s gcc gcc-4.8
+
 cd /cartabuild/CARTAvis/carta/html5/common/skel
 
 ./generate.py source-all > /dev/null

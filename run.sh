@@ -7,6 +7,8 @@ export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
 cd /usr/bin
 ln -s g++ g++-4.8
 
+sed -i.bak '12,13d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
+
 cd /cartabuild/CARTAvis/carta/html5/common/skel
 
 ./generate.py source-all > /dev/null

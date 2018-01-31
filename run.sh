@@ -9,6 +9,8 @@ ln -s g++ g++-4.8
 
 sed -i.bak '12,13d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
 
+more /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
+
 cd /cartabuild/CARTAvis/carta/html5/common/skel
 
 ./generate.py source-all > /dev/null
@@ -21,7 +23,7 @@ cd build
 
 qmake NOSERVER=1 CARTA_BUILD_TYPE=dev ../carta -r
 
-make -j 4
+make
 
 echo "Packaging now"
 #svn export https://github.com/CARTAvis/deploytask/trunk/final_centos7_packaging_steps.sh

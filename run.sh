@@ -2,7 +2,16 @@
 
 echo "Test: Running run.sh script"
 
+docker --version
+
 export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
+
+cd /usr/bin
+ln -s g++ g++-4.8
+
+sed -i.bak '10,11d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
+
+more /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
 
 cd /cartabuild/CARTAvis/carta/html5/common/skel
 
@@ -16,7 +25,7 @@ cd build
 
 qmake NOSERVER=1 CARTA_BUILD_TYPE=dev ../carta -r
 
-make -j 4
+make
 
 echo "Packaging now"
 #svn export https://github.com/CARTAvis/deploytask/trunk/final_centos7_packaging_steps.sh

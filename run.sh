@@ -9,7 +9,7 @@ export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
 cd /usr/bin
 ln -s g++ g++-4.8
 
-sed -i.bak '10,11d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
+#sed -i.bak '10,11d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
 
 more /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
 

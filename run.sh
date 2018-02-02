@@ -4,14 +4,20 @@ echo "Test: Running run.sh script"
 
 docker --version
 
+### Temporarily build cfitsio here
+cd /cartabuild/CARTAvis-externals/ThirdParty/cfitsio-src
+./configure --prefix=/cartabuild/CARTAvis-externals/ThirdParty/cfitsio
+make shared
+make install
+###
+
 export PATH=/opt/Qt/5.3/gcc_64/bin:$PATH
 
 cd /usr/bin
 ln -s g++ g++-4.8
 
 #sed -i.bak '10,11d' /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
-
-more /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
+#more /cartabuild/CARTAvis/carta/cpp/plugins/plugins.pro
 
 cd /cartabuild/CARTAvis/carta/html5/common/skel
 
